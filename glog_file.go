@@ -82,14 +82,14 @@ func shortHostname(hostname string) string {
 
 // logName returns a new log file name containing tag, with start time t, and
 // the name for the symlink for tag.
-func logName(tag string, t time.Time) (name, link string) {    
-	name = fmt.Sprintf("%04d%02d%02d_%02d%02d%02d.%s.txt",
+func logName(tag string, t time.Time) (name, link string) {
+	name = fmt.Sprintf("%04d%02d%02d_%02d%02d%02d.%s-%d.txt",
 		t.Year(),
 		t.Month(),
 		t.Day(),
 		t.Hour(),
 		t.Minute(),
-		t.Second(), tag)
+		t.Second(), tag, pid)
 	return name, program + "." + tag
 }
 
@@ -107,11 +107,11 @@ func create(tag string, t time.Time) (f *os.File, filename string, err error) {
 	name, _ := logName(tag, t)
 	var lastErr error
 	for _, dir := range logDirs {
-        dname := filepath.Join(dir, fmt.Sprintf("%04d%02d%02d", t.Year(), t.Month(), t.Day()))
-        if _, err := os.Stat(dname); os.IsNotExist(err) {
-            os.Mkdir(dname, 0777)
-        }
-   		fname := filepath.Join(dname, name)
+		dname := filepath.Join(dir, fmt.Sprintf("%04d%02d%02d", t.Year(), t.Month(), t.Day()))
+		if _, err := os.Stat(dname); os.IsNotExist(err) {
+			os.Mkdir(dname, 0777)
+		}
+		fname := filepath.Join(dname, name)
 		f, err := os.Create(fname)
 		if err == nil {
 			//symlink := filepath.Join(dir, link)
@@ -125,7 +125,7 @@ func create(tag string, t time.Time) (f *os.File, filename string, err error) {
 }
 
 func fileNameValid(name string) bool {
-    today := time.Now().Format("20060102")
-    fileDate := strings.Split(filepath.Base(name), "_")[0]
-    return fileDate == today
+	today := time.Now().Format("20060102")
+	fileDate := strings.Split(filepath.Base(name), "_")[0]
+	return fileDate == today
 }
